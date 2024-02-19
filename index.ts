@@ -1,20 +1,28 @@
 import { Pool } from "pg";
+import Express from 'express'
+import { urlencoded } from "body-parser";
 
-const express = require('express')
-const app = express()
 
-export const database = new Pool({
+const app = Express()
+app.use(Express.json)
+app.use(urlencoded({extended: true}))
+
+const database = new Pool({
     user: 'postgres',
     host: 'localhost',
-    database: 'lab2_testing',
-    password: '103099',
-    port: 5432
+    database: 'Lab2 (Testing)',
+    password: 'shawn',
+    port: 5433
   })
   
-app.post('/pogs', async (req, res, data) => {
-    try{
-      const query = await database.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4)')
-      const Values = [data.name, data.ticker_symbol, data.price, data.color]
+app.post('/pogs', async (req: Express.Request, res : Express.Response) => {
+    try {
+      const {name, ticker_symbol, price, color} = req.body
+      // const values = [req.body.name, req.body.ticker_symbol, req.body.price, req.body.color]
+      const connect = await database.connect()
+      const query = await connect.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4)', 
+      [name, ticker_symbol, price, color])
+      res.status(201).json(query.rows);
     }catch (err){
       console.error(err);
       res.status(422).json({error:'An error occurred'});
@@ -22,12 +30,11 @@ app.post('/pogs', async (req, res, data) => {
 })
 
 
-app.get('/pogs', async (req, res, data) => {
+app.get('/pogs', async (req : Express.Request, res: Express.Response) => {
   try {
-    const { id } = req.params;
-    const result = await database.query('SELECT * FROM pogs');
-    const result2 = await database.query('SELECT * FROM pogs WHERE id = $1', [id])
-    res.json(result.rows);
+    const connect = await database.connect()
+    const result = await connect.query('SELECT * FROM pogs');
+    res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).send('Internal Server Error');
@@ -35,7 +42,25 @@ app.get('/pogs', async (req, res, data) => {
 });
 
 
-app.patch('/pogs', (req, res) => {
+app.get('/pogs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const connect = await database.connect()
+    const result = await connect.query('SELECT * FROM pogs WHERE id = $1', [id])
+    if (result.rows.length !== 0) {
+    res.status(200).json(result.rows);
+    } else {
+      res.status(404).send('404 not found.')
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+app.patch('/pogs:id', (req, res) => {
+
 
 })
 
