@@ -1,26 +1,26 @@
 import { Pool } from "pg";
-import Express from 'express'
+// import Express from 'express'
 import { urlencoded } from "body-parser";
 
-
+const Express = require('express')
 const app = Express()
-app.use(Express.json)
+app.use(Express.json())
 app.use(urlencoded({extended: true}))
 
 const database = new Pool({
     user: 'postgres',
     host: 'localhost',
-    database: 'Lab2 (Testing)',
-    password: 'shawn',
-    port: 5433
+    database: 'lab2_testing',
+    password: '103099',
+    port: 5432
   })
   
-app.post('/pogs', async (req: Express.Request, res : Express.Response) => {
+app.post('/pogs', async (req, res) => {
     try {
       const {name, ticker_symbol, price, color} = req.body
       // const values = [req.body.name, req.body.ticker_symbol, req.body.price, req.body.color]
       const connect = await database.connect()
-      const query = await connect.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4)', 
+      const query = await connect.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4) RETURNING *', 
       [name, ticker_symbol, price, color])
       res.status(201).json(query.rows);
     }catch (err){
@@ -30,7 +30,7 @@ app.post('/pogs', async (req: Express.Request, res : Express.Response) => {
 })
 
 
-app.get('/pogs', async (req : Express.Request, res: Express.Response) => {
+app.get('/pogs', async (req, res) => {
   try {
     const connect = await database.connect()
     const result = await connect.query('SELECT * FROM pogs');
@@ -59,10 +59,10 @@ app.get('/pogs/:id', async (req, res) => {
 });
 
 
-app.patch('/pogs:id', (req, res) => {
+// app.patch('/pogs:id', (req, res) => {
 
 
-})
+// })
 
 const port = process.env.PORT || 5000
 app.listen(port, ()=> {
