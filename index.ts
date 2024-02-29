@@ -82,6 +82,27 @@ app.put('/pogs/:id', async (req, res) => {
   }
 });
 
+app.delete('/pogs/:id', async (req, res) => {
+  try {
+     const { id } = req.params;
+     const connect = await database.connect();
+     const query = 'DELETE FROM pogs WHERE id = $1';
+     const values = [id];
+     const result = await connect.query(query, values);
+  
+     if (result.rowCount !== null && result.rowCount > 0) {
+       res.status(200).json({ message: 'Record deletd' });
+     } else {
+       res.status(404).send('Record not found');
+     }
+  } catch (err) {
+     console.error(err);
+     res.status(500).send('Internal Server Error');
+  }
+ });
+ 
+ 
+
 
 
 
