@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-// import Express from 'express'
+import { Request, Response } from 'express';
 import { urlencoded } from "body-parser";
 
 const Express = require('express')
@@ -15,7 +15,7 @@ const database = new Pool({
     port: 5432
   })
   
-app.post('/pogs', async (req, res) => {
+app.post('/pogs', async (req:Request, res:Response) => {
     try {
       const {name, ticker_symbol, price, color} = req.body
       // const values = [req.body.name, req.body.ticker_symbol, req.body.price, req.body.color]
@@ -30,7 +30,7 @@ app.post('/pogs', async (req, res) => {
 })
 
 
-app.get('/pogs', async (req, res) => {
+app.get('/pogs', async (req:Request, res:Response) => {
   try {
     const connect = await database.connect()
     const result = await connect.query('SELECT * FROM pogs');
@@ -42,7 +42,7 @@ app.get('/pogs', async (req, res) => {
 });
 
 
-app.get('/pogs/:id', async (req, res) => {
+app.get('/pogs/:id', async (req:Request, res:Response) => {
   try {
     const { id } = req.params;
     const connect = await database.connect()
@@ -58,7 +58,7 @@ app.get('/pogs/:id', async (req, res) => {
   }
 });
 
-app.put('/pogs/:id', async (req, res) => {
+app.put('/pogs/:id', async (req:Request, res:Response) => {
   try {
       const { id } = req.params;
       const { name, ticker_symbol, price, color } = req.body;
@@ -82,7 +82,7 @@ app.put('/pogs/:id', async (req, res) => {
   }
 });
 
-app.delete('/pogs/:id', async (req, res) => {
+app.delete('/pogs/:id', async (req:Request, res:Response) => {
   try {
      const { id } = req.params;
      const connect = await database.connect();
