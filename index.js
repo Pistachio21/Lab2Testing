@@ -37,8 +37,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var pg_1 = require("pg");
-var express_1 = require("express");
-var app = (0, express_1.default)();
+var body_parser_1 = require("body-parser");
+var Express = require('express');
+var app = Express();
+app.use(Express.json());
+app.use((0, body_parser_1.urlencoded)({ extended: true }));
 var database = new pg_1.Pool({
     user: 'postgres',
     host: 'localhost',
@@ -47,69 +50,145 @@ var database = new pg_1.Pool({
     port: 5433
 });
 app.post('/pogs', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var values, query, err_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var _a, name_1, ticker_symbol, price, color, connect, query, err_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                values = [req.body.name, req.body.ticker_symbol, req.body.price, req.body.color];
-                return [4 /*yield*/, database.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4)', values)];
+                _b.trys.push([0, 3, , 4]);
+                _a = req.body, name_1 = _a.name, ticker_symbol = _a.ticker_symbol, price = _a.price, color = _a.color;
+                return [4 /*yield*/, database.connect()];
             case 1:
-                query = _a.sent();
-                res.status(201).json(query.rows);
-                return [3 /*break*/, 3];
+                connect = _b.sent();
+                return [4 /*yield*/, connect.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4) RETURNING *', [name_1, ticker_symbol, price, color])];
             case 2:
-                err_1 = _a.sent();
+                query = _b.sent();
+                res.status(201).json(query.rows);
+                return [3 /*break*/, 4];
+            case 3:
+                err_1 = _b.sent();
                 console.error(err_1);
                 res.status(422).json({ error: 'An error occurred' });
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); });
 app.get('/pogs', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, err_2;
+    var connect, result, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, database.query('SELECT * FROM pogs')];
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, database.connect()];
             case 1:
+                connect = _a.sent();
+                return [4 /*yield*/, connect.query('SELECT * FROM pogs')];
+            case 2:
                 result = _a.sent();
                 res.status(200).json(result.rows);
-                return [3 /*break*/, 3];
-            case 2:
+                return [3 /*break*/, 4];
+            case 3:
                 err_2 = _a.sent();
                 console.error(err_2);
                 res.status(500).send('Internal Server Error');
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); });
 app.get('/pogs/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, result, err_3;
+    var id, connect, result, err_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
+                _a.trys.push([0, 3, , 4]);
                 id = req.params.id;
-                return [4 /*yield*/, database.query('SELECT * FROM pogs WHERE id = $1', [id])];
+                return [4 /*yield*/, database.connect()];
             case 1:
-                result = _a.sent();
-                res.status(200).json(result.rows);
-                return [3 /*break*/, 3];
+                connect = _a.sent();
+                return [4 /*yield*/, connect.query('SELECT * FROM pogs WHERE id = $1', [id])];
             case 2:
+                result = _a.sent();
+                if (result.rows.length !== 0) {
+                    res.status(200).json(result.rows);
+                }
+                else {
+                    res.status(404).send('404 not found.');
+                }
+                return [3 /*break*/, 4];
+            case 3:
                 err_3 = _a.sent();
                 console.error(err_3);
                 res.status(500).send('Internal Server Error');
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); });
-app.patch('/pogs:id', function (req, res) {
-});
+app.put('/pogs/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, _a, name_2, ticker_symbol, price, color, connect, query, values, result, err_4;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 3, , 4]);
+                id = req.params.id;
+                _a = req.body, name_2 = _a.name, ticker_symbol = _a.ticker_symbol, price = _a.price, color = _a.color;
+                return [4 /*yield*/, database.connect()];
+            case 1:
+                connect = _b.sent();
+                query = "UPDATE pogs SET name = $1, ticker_symbol = $2, price = $3, color = $4 WHERE id = $5 RETURNING *";
+                values = [name_2, ticker_symbol, price, color, id];
+                return [4 /*yield*/, connect.query(query, values)];
+            case 2:
+                result = _b.sent();
+                // Check if rowCount is not null before using it
+                if (result.rowCount !== null && result.rowCount > 0) {
+                    res.status(200).json(result.rows[0]);
+                }
+                else {
+                    res.status(404).send('Record not found');
+                }
+                return [3 /*break*/, 4];
+            case 3:
+                err_4 = _b.sent();
+                console.error(err_4);
+                res.status(500).send('Internal Server Error');
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); });
+app.delete('/pogs/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, connect, query, values, result, err_5;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                id = req.params.id;
+                return [4 /*yield*/, database.connect()];
+            case 1:
+                connect = _a.sent();
+                query = 'DELETE FROM pogs WHERE id = $1';
+                values = [id];
+                return [4 /*yield*/, connect.query(query, values)];
+            case 2:
+                result = _a.sent();
+                if (result.rowCount !== null && result.rowCount > 0) {
+                    res.status(200).json({ message: 'Record deletd' });
+                }
+                else {
+                    res.status(404).send('Record not found');
+                }
+                return [3 /*break*/, 4];
+            case 3:
+                err_5 = _a.sent();
+                console.error(err_5);
+                res.status(500).send('Internal Server Error');
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); });
 var port = process.env.PORT || 5000;
 app.listen(port, function () {
     console.log("Server started on localhost:".concat(port));

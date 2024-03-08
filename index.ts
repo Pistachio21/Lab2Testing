@@ -10,22 +10,25 @@ app.use(urlencoded({extended: true}))
 const database = new Pool({
     user: 'postgres',
     host: 'localhost',
-    database: 'lab2_testing',
-    password: '103099',
-    port: 5432
+    database: 'Lab2 (Testing)',
+    password: 'shawn',
+    port: 5433
   })
   
 app.post('/pogs', async (req:Request, res:Response) => {
     try {
       const {name, ticker_symbol, price, color} = req.body
-      // const values = [req.body.name, req.body.ticker_symbol, req.body.price, req.body.color]
-      const connect = await database.connect()
-      const query = await connect.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4) RETURNING *', 
-      [name, ticker_symbol, price, color])
-      res.status(201).json(query.rows);
+      if (name && ticker_symbol && price && color) {
+        const connect = await database.connect()
+        const query = await connect.query('INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4) RETURNING *', 
+        [name, ticker_symbol, price, color])
+        res.status(201).json(query.rows);
+      } else {
+        res.status(422).json({error:422});
+      }
     }catch (err){
-      console.error(err);
-      res.status(422).json({error:'An error occurred'});
+      console.error(err)
+      res.status(500).send('Internal Server Error');
     }
 })
 
@@ -50,7 +53,7 @@ app.get('/pogs/:id', async (req:Request, res:Response) => {
     if (result.rows.length !== 0) {
     res.status(200).json(result.rows);
     } else {
-      res.status(404).send('404 not found.')
+      res.status(404).send(404)
     }
   } catch (err) {
     console.error(err);
@@ -91,7 +94,7 @@ app.delete('/pogs/:id', async (req:Request, res:Response) => {
      const result = await connect.query(query, values);
   
      if (result.rowCount !== null && result.rowCount > 0) {
-       res.status(200).json({ message: 'Record deletd' });
+       res.status(200).json({ message: 'Record deleted' });
      } else {
        res.status(404).send('Record not found');
      }
@@ -100,16 +103,6 @@ app.delete('/pogs/:id', async (req:Request, res:Response) => {
      res.status(500).send('Internal Server Error');
   }
  });
- 
- 
-
-
-
-
-// app.patch('/pogs:id', (req, res) => {
-
-
-// })
 
 const port = process.env.PORT || 5000
 app.listen(port, ()=> {
