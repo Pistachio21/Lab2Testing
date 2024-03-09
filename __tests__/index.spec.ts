@@ -1,16 +1,17 @@
-import axios from 'axios'
+const supertest = require('supertest')
+import {app} from '../index';
 
 describe('testing POST methods', () => {
     it('should create a new pog', async () => {
         const newPog = {
-            "name": 'Sample Pog',
-            "ticker_symbol": 'SAMPLE',
-            "price": 1000,
-            "color": 'yellow'
+            name :'Sample Pog',
+            ticker_symbol: 'SAMPLE',
+            price: 1000,
+            color: 'yellow'
         };
-        const response = await axios.post('http://localhost:5000/pogs', newPog);
-        expect(response.status).toBe(201);
-        expect(response.data).toBeInstanceOf(Object);
+        const response = await supertest(app).post('/pogs').send(newPog);
+        expect(response.statusCode).toBe(201);
+        expect(response.body).toBeInstanceOf(Object);
     });
 
     it('should handle errors properly', async () => {
@@ -18,39 +19,37 @@ describe('testing POST methods', () => {
             const newPog = {
                 name: 'Error Pog',
                 ticker_symbol: 'ERR',
-                price: 100,
-                color: 'green'
+                price: 100
             };
-            await axios.post('http://localhost:5000/pogs', newPog);
+            await supertest(app).post('/pogs', newPog);
         } catch(err : any) {
-            expect(err.response.status).toBe(422);
+            expect(err.status).toBe(422);
         }
     });
-    
 });
 
 describe('testing GET method', () => {
     it('should get all pogs', async () => {
-        const response = await axios.get('http://localhost:5000/pogs')
-        expect(response.status).toBe(200);
-        expect(response.data).toBeInstanceOf(Array);
+        const response = await supertest(app).get('/pogs')
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toBeInstanceOf(Array);
     });
 });
 
 describe('testing GET method', () => {
     it('should get a pog by ID', async () => {
-        const response = await axios.get('http://localhost:5000/pogs/2')
+        const response = await supertest(app).get('/pogs/42')
 
-        expect(response.status).toBe(200);
-        expect(response.data).toBeInstanceOf(Array);
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toBeInstanceOf(Array);
     });
 
     it('should handle if a pog is not found', async () => {
         try {
-        const response = await axios.get('http://localhost:5000/pogs/999')
-        expect(response.status).toBe(404);
+        const response = await supertest(app).get('/pogs/999')
+        expect(response.statusCode).toBe(404);
         } catch (err: any) {
-            expect(err.response.status).toBe(404)
+            expect(err.status).toBe(404)
         }
     });
 });
@@ -64,14 +63,14 @@ describe('testing PUT method', () => {
     };
     it('should update a pog based on ID', async () => {
 
-        const response = await axios.put('http://localhost:5000/pogs/11', updatedPog)
+        const response = await supertest(app).put('/pogs/38', updatedPog)
         expect(response.status).toBe(200);
         expect(response).toEqual(expect.any(Object));
     });
 
     it('should throw an error if a pog does not exist', async () => {
         try {
-        const response = await axios.put('http://localhost:5000/pogs/999', updatedPog)
+        const response = await supertest(app).put('/pogs/999', updatedPog)
         expect(response.status).toBe(404);
         } catch(err : any) {
             expect(err.response.status).toBe(404);
@@ -81,18 +80,18 @@ describe('testing PUT method', () => {
 
 describe('testing DELETE method', () => {
     it('should delete a pog by ID', async () => {
-        const response = await axios.delete('http://localhost:5000/pogs/13');
+        const response = await supertest(app).delete('/pogs/7');
 
-        expect(response.status).toBe(200);
-        expect(response.data).toEqual({ message: 'Record deleted' });
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toEqual({ message: 'Record deleted' });
     });
 
     it('should throw an error if the pog does not exist', async () => {
         try {
-            await axios.delete('http://localhost:5000/pogs/999');
+            await supertest(app).delete('/pogs/999');
         } catch (error : any) {
-            expect(error.response.status).toBe(404);
-            expect(error.response.data).toBe('Record not found');
+            expect(error.response.statusCode).toBe(404);
+            expect(error.response.body).toBe('Record not found');
         }
     });
 });

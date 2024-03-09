@@ -2,9 +2,9 @@ import { Pool } from "pg";
 import { Request, Response } from 'express';
 import { urlencoded } from "body-parser";
 
-const Express = require('express')
-const app = Express()
-app.use(Express.json())
+import express from 'express';
+const app = express()
+app.use(express.json())
 app.use(urlencoded({extended: true}))
 
 const database = new Pool({
@@ -108,3 +108,5 @@ const port = process.env.PORT || 5000
 app.listen(port, ()=> {
     console.log(`Server started on localhost:${port}`)
 })
+
+export {app}
