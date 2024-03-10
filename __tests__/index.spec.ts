@@ -21,7 +21,7 @@ describe('testing POST methods', () => {
                 ticker_symbol: 'ERR',
                 price: 100
             };
-            await supertest(app).post('/pogs', newPog);
+            await supertest(app).post('/pogs').send(newPog);
         } catch(err : any) {
             expect(err.status).toBe(422);
         }
@@ -63,7 +63,7 @@ describe('testing PUT method', () => {
     };
     it('should update a pog based on ID', async () => {
 
-        const response = await supertest(app).put('/pogs/60').send(updatedPog)
+        const response = await supertest(app).put('/pogs/58').send(updatedPog)
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Object);
     });
@@ -80,7 +80,7 @@ describe('testing PUT method', () => {
 
 describe('testing DELETE method', () => {
     it('should delete a pog by ID', async () => {
-        const response = await supertest(app).delete('/pogs/55');
+        const response = await supertest(app).delete('/pogs/63');
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Record deleted' });
