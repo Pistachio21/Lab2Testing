@@ -68,7 +68,8 @@ app.put('/pogs/:id', async (req:Request, res:Response) => {
       const connect = await database.connect();
       
       // Prepare the update statement
-      const query = `UPDATE pogs SET name = $1, ticker_symbol = $2, price = $3, color = $4 WHERE id = $5 RETURNING *`;
+      const query = `UPDATE pogs SET name = $1, ticker_symbol = $2,
+      price = $3, color = $4 WHERE id = $5 RETURNING *`;
       const values = [name, ticker_symbol, price, color, id];
       
       const result = await connect.query(query, values);

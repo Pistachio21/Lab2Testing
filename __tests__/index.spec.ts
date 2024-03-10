@@ -63,14 +63,14 @@ describe('testing PUT method', () => {
     };
     it('should update a pog based on ID', async () => {
 
-        const response = await supertest(app).put('/pogs/38', updatedPog)
+        const response = await supertest(app).put('/pogs/60').send(updatedPog)
         expect(response.status).toBe(200);
-        expect(response).toEqual(expect.any(Object));
+        expect(response.body).toBeInstanceOf(Object);
     });
 
     it('should throw an error if a pog does not exist', async () => {
         try {
-        const response = await supertest(app).put('/pogs/999', updatedPog)
+        const response = await supertest(app).put('/pogs/999').send(updatedPog)
         expect(response.status).toBe(404);
         } catch(err : any) {
             expect(err.response.status).toBe(404);
@@ -80,7 +80,7 @@ describe('testing PUT method', () => {
 
 describe('testing DELETE method', () => {
     it('should delete a pog by ID', async () => {
-        const response = await supertest(app).delete('/pogs/7');
+        const response = await supertest(app).delete('/pogs/55');
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Record deleted' });
