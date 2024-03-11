@@ -82,7 +82,7 @@ describe('testing PUT method', () => {
 describe('testing DELETE method', () => {
     
     it('should delete a pog by ID', async () => {
-        const response = await supertest(app).delete('/pogs/64');
+        const response = await supertest(app).delete('/pogs/17');
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Record deleted' });
     });
