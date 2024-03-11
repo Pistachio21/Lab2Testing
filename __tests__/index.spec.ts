@@ -1,5 +1,7 @@
-const supertest = require('supertest')
-import {app} from '../index';
+const supertest = require('supertest');
+
+import { app } from "../src/index"
+import { database } from "../src/routes";
 
 describe('testing POST methods', () => {
     it('should create a new pog', async () => {
@@ -11,7 +13,7 @@ describe('testing POST methods', () => {
         };
         const response = await supertest(app).post('/pogs').send(newPog);
         expect(response.statusCode).toBe(201);
-        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body[0]).toEqual(expect.objectContaining(newPog));
     });
 
     it('should handle errors properly', async () => {
@@ -29,32 +31,32 @@ describe('testing POST methods', () => {
 });
 
 describe('testing GET method', () => {
+
     it('should get all pogs', async () => {
-        const response = await supertest(app).get('/pogs')
+        const response = await supertest(app).get('/pogs');
         expect(response.statusCode).toBe(200);
         expect(response.body).toBeInstanceOf(Array);
     });
-});
 
-describe('testing GET method', () => {
     it('should get a pog by ID', async () => {
-        const response = await supertest(app).get('/pogs/42')
-
+        const id = 42;
+        const response = await supertest(app).get(`/pogs/${id}`);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toBeInstanceOf(Array);
+        expect(response.body[0]).toEqual(expect.objectContaining({id: id}));
     });
 
     it('should handle if a pog is not found', async () => {
         try {
-        const response = await supertest(app).get('/pogs/999')
-        expect(response.statusCode).toBe(404);
-        } catch (err: any) {
-            expect(err.status).toBe(404)
+            const response = await supertest(app).get('/pogs/999');
+            expect(response.statusCode).toBe(404);
+        } catch (err : any) {
+            expect(err.status).toBe(404);
         }
     });
 });
 
 describe('testing PUT method', () => {
+
     const updatedPog = {
         "name": 'Sample Pog',
         "ticker_symbol": 'UPDATED',
@@ -62,16 +64,15 @@ describe('testing PUT method', () => {
         "color": 'red'
     };
     it('should update a pog based on ID', async () => {
-
-        const response = await supertest(app).put('/pogs/58').send(updatedPog)
+        const response = await supertest(app).put('/pogs/58').send(updatedPog);
         expect(response.status).toBe(200);
-        expect(response.body).toBeInstanceOf(Object);
+        expect(response.body).toEqual(expect.objectContaining(updatedPog));
     });
 
     it('should throw an error if a pog does not exist', async () => {
         try {
-        const response = await supertest(app).put('/pogs/999').send(updatedPog)
-        expect(response.status).toBe(404);
+            const response = await supertest(app).put('/pogs/999').send(updatedPog);
+            expect(response.status).toBe(404);
         } catch(err : any) {
             expect(err.response.status).toBe(404);
         }
@@ -79,9 +80,9 @@ describe('testing PUT method', () => {
 });
 
 describe('testing DELETE method', () => {
+    
     it('should delete a pog by ID', async () => {
-        const response = await supertest(app).delete('/pogs/63');
-
+        const response = await supertest(app).delete('/pogs/64');
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({ message: 'Record deleted' });
     });
@@ -95,3 +96,7 @@ describe('testing DELETE method', () => {
         }
     });
 });
+
+afterAll(async () => {
+    await database.end()
+})
